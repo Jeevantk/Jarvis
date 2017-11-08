@@ -1,0 +1,15 @@
+<div ng-controller="personCtrl" ng-init="resetPersonGroupTrain()">
+    <center>
+        <h4> Train person group </h4>
+        <div class="input-group col-md-6">
+            <span class="input-group-addon" id="basic-addon1">Person Group Id</span>
+            <input type="text" ng-model="personGroupTrain.personGroupId" class="form-control" placeholder="Person Group Id" aria-label="Person Group Id" aria-describedby="basic-addon1">
+        </div>
+        <br>
+        <button type="button" class="btn btn-danger" ng-click="trainPersonGroup(personGroupTrain)">Train</button>
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-primary" ng-click="getPersonGroupTrainingStatus(personGroupTrain)"> Get training status</button>
+            <button type="button" class="btn btn-secondary"> {{ personGroupTrain.status.status }}</button>
+        </div>
+    </center>
+</div>

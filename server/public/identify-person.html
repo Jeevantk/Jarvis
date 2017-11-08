@@ -1,0 +1,29 @@
+<div ng-controller="personCtrl" ng-init="resetIdentifyQuery()">
+	<center>
+		<h4> Identify person </h4>
+		<div class="input-group col-md-6">
+			<span class="input-group-addon" id="basic-addon1">Person Group Id</span>
+			<input type="text" ng-model="identifyQueryObj.personGroupId" class="form-control" placeholder="Person Group Id" aria-label="Person Group Id" aria-describedby="basic-addon1">
+		</div>
+		<br>
+		<div class="input-group col-md-6">
+			<span class="input-group-addon" id="basic-addon1">Confidence threshold</span>
+			<input type="text" ng-model="identifyQueryObj.confidenceThreshold" class="form-control" placeholder="Confidence threshold" aria-label="Confidence threshold" aria-describedby="basic-addon1">
+		</div>
+		<br>
+		<div class="col-md-6">
+			<input type="radio" ng-model="identifyQueryObj.inputType" value="file"> File
+			<input type="radio" ng-model="identifyQueryObj.inputType" value="url"> Url
+		</div>
+		<br>
+		<div ng-show="identifyQueryObj.inputType == 'file'">
+			<input id="file-input" ngf-max-size="20MB" ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen)">
+		</div>
+		<div ng-show="identifyQueryObj.inputType == 'url'" class="input-group col-md-6">
+			<span class="input-group-addon" id="basic-addon1">Url</span>
+			<input type="text" ng-model="identifyQueryObj.url" class="form-control" placeholder="Urls" aria-label="Urls" aria-describedby="basic-addon1">
+		</div>
+		<br>
+		<button type="button" class="btn btn-danger" ng-click="identifyPersonFromFace(identifyQueryObj)">Submit</button>
+	</center>
+</div>

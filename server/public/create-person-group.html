@@ -1,0 +1,16 @@
+<div ng-controller="personCtrl" ng-init="resetPersonGroupCreate()">
+    <center>
+        <h4> Create person group </h4>
+        <div class="input-group col-md-6">
+            <span class="input-group-addon" id="basic-addon1">Person Group Id</span>
+            <input type="text" ng-model="personGroup.id" class="form-control" placeholder="Person Group Id" aria-label="Person Group Id" aria-describedby="basic-addon1">
+        </div>
+        <br>
+        <div class="input-group col-md-6">
+            <span class="input-group-addon" id="basic-addon1">Person Group Id</span>
+            <input type="text" ng-model="personGroup.name" class="form-control" placeholder="Person Group Name" aria-label="Person Group Name" aria-describedby="basic-addon1">
+        </div>
+        <br>
+        <button type="button" class="btn btn-danger" ng-click="createPersonGroup(personGroup)">Create</button>
+    </center>
+</div>

@@ -16,7 +16,8 @@ router.post('/create', controller.personCreate);
 
 // Person group APIs
 router.post('/group/create', controller.personGroupCreate);
-router.post('/group/train', controller.personGroupTrain);
+router.post('/group/:personGroupId/train', controller.personGroupTrain);
+router.get('/group/:personGroupId/training-status', controller.personGroupTrainingStatus);
 
 router.post('/group/identify', controller.personGroupIdentify);
 

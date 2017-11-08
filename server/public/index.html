@@ -1,27 +1,46 @@
 <html>
+
 <head>
-	<script src="js/angular.min.js"></script>
-	<script src="js/ng-file-upload.min.js"></script>
-	<script src="js/person-ctrl.js"></script>
-	<!-- <script type="text/javascript" src="https://rawgithub.com/hiddentao/google-tts/master/google-tts.min.js"></script> -->
-	<script src="js/ng-file-upload-shim.min.js"></script>
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <script src="js/angular.min.js"></script>
+    <script src="js/ng-file-upload.min.js"></script>
+    <script src="js/person-ctrl.js"></script>
+    <!-- <script type="text/javascript" src="https://rawgithub.com/hiddentao/google-tts/master/google-tts.min.js"></script> -->
+    <script src="js/ng-file-upload-shim.min.js"></script>
 
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
-
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 </head>
-<body ng-app="fid-app">
-	<div ng-controller="personCtrl">
-		<center>
-			<div style="padding:100">
-				<input id="file-input" ngf-max-size="20MB"
-				ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen)">
-			</div>
-		</center>
-	</div>
+
+<body ng-app="fid-app" ng-init="pref=0">
+    <div ng-controller="personCtrl">
+        <center>
+          <br>
+            <h2> Person identification </h2>
+            <br>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=0">Create person group</button>
+                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=1">Create person</button>
+                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=2">Train person group</button>
+                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=3">Identify person</button>
+            </div>
+        </center>
+    </div>
+    <br>
+    <div ng-if="pref==0">
+        <div ng-include="'create-person-group.html'"></div>
+    </div>
+    <div ng-if="pref==1">
+        <div ng-include="'create-person.html'"></div>
+    </div>
+    <div ng-show="pref==2">
+        <div ng-include="'train-person-group.html'"></div>
+    </div>
+    <div ng-show="pref==3">
+        <div ng-include="'identify-person.html'"></div>
+    </div>
 </body>
+
 </html>

@@ -35,21 +35,40 @@ exports.personCreate = function(req, res) {
       Q.all(plist).then(function(ret) {
         // console.log(ret[0]);
         res.send(ret[0]);
+      }, function(err) {
+        res.send(err);
       });
+    }, function(err) {
+      res.send(err);
     });
+  }, function(err) {
+    res.send(err);
   });
 }
 
 exports.personGroupCreate = function(req, res) {
   api.createPersonGroup(req.body.id, req.body.name).then(function() {
-    res.send("done");
+    res.send('OK');
+  }, function(err) {
+    res.send(err);
   });
 }
 
 exports.personGroupTrain = function(req, res) {
-  var personGroupId = req.body.personGroupId;
+  var personGroupId = req.params.personGroupId;
   api.trainPersonGroup(personGroupId).then(function() {
-    res.send("done");
+    res.send('OK');
+  }, function(err) {
+    res.send(err);
+  });
+}
+
+exports.personGroupTrainingStatus = function(req, res) {
+  var personGroupId = req.params.personGroupId;
+  api.getPersonGroupTrainingStatus(personGroupId).then(function(data) {
+    res.send(data);
+  }, function(err) {
+    res.send(err);
   });
 }
 
@@ -67,8 +86,21 @@ exports.personGroupIdentify = function(req, res) {
       return ele.faceId;
     });
     api.identifyFace(personGroupId, faceIds, confidenceThreshold).then(function(arr) {
-      // console.log(arr);
-      res.send(JSON.stringify(arr));
+      if(!arr.length) {
+        res.send('__unknown__');
+      } else {
+        // TODO check these zero-index accesses
+        var personId = arr[0].candidates[0]["personId"];
+        api.getPerson(personGroupId, personId).then(function(obj) {
+          res.send(obj);
+        }, function(err) {
+          res.send(err);
+        });
+      }
+    }, function(err) {
+      res.send(err);
     });
+  }, function(err) {
+    res.send(err);
   });
 }

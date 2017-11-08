@@ -1,0 +1,25 @@
+<div ng-controller="personCtrl" ng-init="resetPerson()">
+	<center>
+		<h4> Create person </h4>
+		<div class="input-group col-md-6">
+			<span class="input-group-addon" id="basic-addon1">Person Group Id</span>
+			<input type="text" ng-model="person.personGroupId" class="form-control" placeholder="Person Group Id" aria-label="Person Group Id" aria-describedby="basic-addon1">
+		</div>
+		<br>
+		<div class="input-group col-md-6">
+			<span class="input-group-addon" id="basic-addon1">Name</span>
+			<input type="text" ng-model="person.name" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
+		</div>
+		<br>
+		<div>
+			<input id="file-input" ngf-max-size="20MB" ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen, person)">
+		</div>
+		<br>
+		<div class="input-group col-md-6">
+			<span class="input-group-addon" id="basic-addon1">Urls (comma separated)</span>
+			<input type="text" ng-model="person.rawurls" class="form-control" placeholder="Urls (comma separated)" aria-label="Urls (comma separated)" aria-describedby="basic-addon1">
+		</div>
+		<br>
+		<button type="button" class="btn btn-danger" ng-click="createPersonFromFaces(person)">Submit</button>
+	</center>
+</div>
