@@ -16,6 +16,22 @@
 
 <body ng-app="fid-app">
     <div ng-controller="personCtrl" id="angular-div" ng-init="resetIdentifyQuery()">
+      <center>
+        <br>
+      <h2> Person identification - video feed </h2>
+      <br>
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button class="btn btn-secondary" type="button">Person Group Id</button>
+            </span>
+            <input type="text" class="form-control" ng-model="personGroupId" placeholder="Person Group Id">
+            <span class="input-group-btn">
+              <button class="btn btn-danger" onclick="start_id()" style="cursor:pointer" type="button">Start</button>
+            </span>
+          </div>
+        </div>
+      </center>
         <video id="webcam" width="640" height="480" style="display:none;"></video>
         <div style=" width:640px;height:480px;margin: 10px auto;">
             <canvas id="canvas" width="640" height="480"></canvas>
@@ -34,7 +50,7 @@
         <script type="text/javascript" src="js/jsfeat/profiler.js"></script>
         <script type="text/javascript" src="js/jsfeat/dat.gui.min.js"></script>
         <script type="text/javascript">
-            $(window).load(function() {
+            function start_id() {
                 "use strict";
 
                 // lets do some fun
@@ -147,11 +163,14 @@
                 const IDENTIFY_QUERY_FREQ = 600;
 
                 scope.idArr = [];
+                scope.overlay = null;
 
                 function setIdArr(len) {
                     while (scope.idArr.length < len) {
                         scope.idArr.push({
-                            query: {},
+                            query: {
+                                personGroupId: scope.personGroupId
+                            },
                             resp: {}
                         });
                     }
@@ -212,6 +231,16 @@
                     return canvas1;
                 }
 
+                function drawOverlay() {
+                    if (scope.overlay !== null) {
+                        var rect = scope.overlay.rect;
+                        ctx.font = "24px Comic Sans MS";
+                        ctx.fillStyle = "black";
+                        ctx.textAlign = "center";
+                        ctx.fillText(scope.overlay.text, rect[0], rect[1]);
+                    }
+                }
+
                 function draw_faces(ctx, rects, sc, max) {
                     var on = rects.length;
                     if (on && max) {
@@ -226,19 +255,27 @@
                         (function(i) {
                             r = rects[i];
                             if (FRAME_IDX == 1) {
-                                console.log('ping', sc);
+                                // console.log('ping', sc);
                                 xp = parseInt(r.width * 0.3);
                                 yp = parseInt(r.height * 0.3);
                                 scope.idArr[i].query.state = {
-                                    rectIdx: i
+                                    rectIdx: i,
+                                    rect: [((r.x - xp) * sc) | 0, ((r.y - yp) * sc) | 0, ((r.width + 2 * xp) * sc) | 0, ((r.height + 2 * yp) * sc) | 0]
                                 };
                                 cropPlusExport(canvas, ((r.x - xp) * sc) | 0, ((r.y - yp) * sc) | 0, ((r.width + 2 * xp) * sc) | 0, ((r.height + 2 * yp) * sc) | 0).toBlob(function(blob) {
                                     // console.log(scope.idArr,i,scope.idArr[i]);
                                     blob.name = 'image.png';
                                     scope.uploadFile([blob], scope.idArr[i].query).then(function(query) {
                                         scope.identifyPersonFromFace(query, {}).then(function(data) {
-                                            var rectIdx = data.state.rectIdx;
-                                            console.log(rectIdx, data);
+                                            if (data.name !== 'unknown') {
+                                                // console.log(data);
+                                                var rectIdx = data.state.rectIdx;
+                                                var rect = data.state.rect;
+                                                scope.overlay = {
+                                                    rect: rect,
+                                                    text: data.name + " | " + data.userData
+                                                };
+                                            }
                                         }, function(err) {
                                             console.log(err);
                                         });
@@ -247,6 +284,7 @@
                                     });
                                 });
                             } else {
+                                drawOverlay();
                                 // ctx.strokeRect((r.x * sc) | 0, (r.y * sc) | 0, (r.width * sc) | 0, (r.height * sc) | 0);
                             }
                         })(i);
@@ -257,7 +295,7 @@
                     video.pause();
                     video.src = null;
                 });
-            });
+            }
         </script>
     </div>
 </body>

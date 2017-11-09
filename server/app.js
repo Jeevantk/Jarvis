@@ -24,6 +24,10 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
+// app.use('/uploads/', function(req, res, next) {
+//   res.contentType('application/json');
+//   next();
+// });
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(multer({
@@ -49,6 +53,7 @@ app.use('/', function(req, res, next) {
         res.writeHead(200, headers);
         res.end();
     } else {
+        res.header("Access-Control-Allow-Origin", "*");
         next();
     }
 });

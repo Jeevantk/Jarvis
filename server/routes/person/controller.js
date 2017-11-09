@@ -39,6 +39,7 @@ exports.personCreate = function(req, res) {
         res.send(err);
       });
     }, function(err) {
+      debugger;
       res.send(err);
     });
   }, function(err) {

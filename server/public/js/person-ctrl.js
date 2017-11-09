@@ -111,7 +111,7 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
 
         $http(req).
         then(function(response) {
-            // console.log(response);
+            console.log(response);
             alert('Done');
             $scope.resetPerson();
         }, function(err) {
@@ -165,7 +165,7 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
 
         $http(req).
         then(function(response) {
-            console.log(response);
+            // console.log(response);
             $scope.personGroupTrain.status = response.data;
         }, function(err) {
             console.log(err);
