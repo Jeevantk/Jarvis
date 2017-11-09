@@ -1,1 +1,1 @@
-sudo forever stop bin/www; sudo forever start bin/www
+forever stop bin/www; forever start bin/www; forever list;
