@@ -174,7 +174,7 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
 
     $scope.uploadFile = function(files, obj) {
         var upload = Upload.upload({
-            url: '/',
+            url: 'http://13.127.11.214:3000/',
             method: 'POST',
             headers: {
                 'Content-Type': 'multipart/form-data',
