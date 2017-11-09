@@ -29,10 +29,10 @@
         </center>
     </div>
     <br>
-    <div ng-if="pref==0">
+    <div ng-show="pref==0">
         <div ng-include="'create-person-group.html'"></div>
     </div>
-    <div ng-if="pref==1">
+    <div ng-show="pref==1">
         <div ng-include="'create-person.html'"></div>
     </div>
     <div ng-show="pref==2">

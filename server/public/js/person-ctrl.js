@@ -78,7 +78,7 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
             if (data == '__unknown__') {
                 alert('Unknown');
             } else {
-                alert(data.name);
+                alert(JSON.stringify(data));
             }
         }, function(err) {
             console.log(err);

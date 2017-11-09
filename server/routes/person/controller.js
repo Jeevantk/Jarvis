@@ -17,7 +17,7 @@ var _ = require('underscore');
 exports.personCreate = function(req, res) {
   var name = req.body.name, url = req.body.url.split(','), data = req.body.data;
   var personGroupId = req.body.personGroupId;
-  api.createPerson(personGroupId, name).then(function(personId) {
+  api.createPerson(personGroupId, name, req.body.data).then(function(personId) {
     var plist = [];
     for(var i = 0; i < url.length; ++i) {
       plist.push(api.detectFace(url[i]));

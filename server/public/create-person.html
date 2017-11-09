@@ -11,6 +11,11 @@
 			<input type="text" ng-model="person.name" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
 		</div>
 		<br>
+		<div class="input-group col-md-6">
+			<span class="input-group-addon" id="basic-addon1">Data</span>
+			<input type="text" ng-model="person.data" class="form-control" placeholder="Data" aria-label="Data" aria-describedby="basic-addon1">
+		</div>
+		<br>
 		<div>
 			<input id="file-input" ngf-max-size="20MB" ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen, person)">
 		</div>
