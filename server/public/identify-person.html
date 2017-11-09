@@ -17,13 +17,19 @@
 		</div>
 		<br>
 		<div ng-show="identifyQueryObj.inputType == 'file'">
-			<input id="file-input" ngf-max-size="20MB" ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen)">
+			<input id="file-input" ngf-max-size="20MB" ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen, identifyQueryObj)">
 		</div>
 		<div ng-show="identifyQueryObj.inputType == 'url'" class="input-group col-md-6">
 			<span class="input-group-addon" id="basic-addon1">Url</span>
 			<input type="text" ng-model="identifyQueryObj.url" class="form-control" placeholder="Urls" aria-label="Urls" aria-describedby="basic-addon1">
 		</div>
 		<br>
-		<button type="button" class="btn btn-danger" ng-click="identifyPersonFromFace(identifyQueryObj)">Submit</button>
+		<button type="button" class="btn btn-danger" ng-click="identifyPersonFromFace(identifyQueryObj, identifyResultObj)">Submit</button>
+		<br>
+		<br>
+		<div class="btn-group" role="group" aria-label="Basic example">
+				<button type="button" class="btn btn-primary"> Person </button>
+				<button type="button" class="btn btn-secondary"> {{ identifyResultObj.name + " | " + identifyResultObj.userData }}</button>
+		</div>
 	</center>
 </div>

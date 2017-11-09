@@ -92,6 +92,8 @@ exports.personGroupIdentify = function(req, res) {
         // TODO check these zero-index accesses
         var personId = arr[0].candidates[0]["personId"];
         api.getPerson(personGroupId, personId).then(function(obj) {
+          // Transferring state back in response like OAuth APIs
+          obj.state = req.body.state;
           res.send(obj);
         }, function(err) {
           res.send(err);

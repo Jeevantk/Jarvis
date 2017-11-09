@@ -43,6 +43,11 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
             confidenceThreshold: 0.7,
             inputType: 'url'
         };
+
+        $scope.identifyResultObj = {
+          name: "not-yet-identified",
+          userData: null
+        };
     }
 
     $scope.resetPersonGroupTrain = function() {
@@ -57,7 +62,7 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
         $scope.personGroup = {};
     }
 
-    $scope.identifyPersonFromFace = function(obj) {
+    $scope.identifyPersonFromFace = function(obj, out) {
         if (obj.url instanceof Array) {
             obj.url = obj.url[0];
         }
@@ -71,17 +76,23 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
             }
         };
 
-        $http(req).
+        return $http(req).
         then(function(response) {
-            // console.log(response);
             var data = response.data;
+            // console.log(data);
             if (data == '__unknown__') {
-                alert('Unknown');
+                out.name = 'unknown';
+                out.userData = null;
+                return out;
             } else {
-                alert(JSON.stringify(data));
+              for (key in data) {
+                out[key] = data[key];
+              }
+              return out;
             }
         }, function(err) {
             console.log(err);
+            return err;
         });
     }
 
@@ -173,10 +184,13 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
             file: files,
         });
 
-        upload.then(function(response) {
+        return upload.then(function(response) {
             obj.url = response.data;
+            // console.log(obj);
+            return obj;
         }, function(err) {
             console.log(err);
+            return err;
         });
     };
 });
