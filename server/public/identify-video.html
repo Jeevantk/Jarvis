@@ -9,8 +9,11 @@
     <center>
         <br>
         <div class="col-md-6">
-            <button class="btn btn-danger" onclick="toggleRunning()" style="cursor:pointer" type="button">
+            <button class="btn btn-danger" onclick="toggleRunning(false)" style="cursor:pointer" type="button">
               {{ running && 'Stop' || 'Start'}}
+            </button>
+            <button class="btn btn-danger" onclick="toggleRunning(true)" style="cursor:pointer" type="button">
+              Capture
             </button>
         </div>
     </center>

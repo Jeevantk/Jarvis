@@ -222,7 +222,10 @@ app.controller('personCtrl', function($scope, $http, Upload, $window, Notificati
 
     $scope.noOneDetected = true;
 
+    // setInterval($scope.displayDetected, 1000);
+
     $scope.displayDetected = function() {
+      // console.log('displayDetected', $scope.detected);
       var curTime = (new Date()).getTime()/1000;
       var expiredIds = [];
       $scope.noOneDetected = true;

@@ -41,13 +41,14 @@
     <script type="text/javascript" src="js/jsfeat/profiler.js"></script>
     <script type="text/javascript" src="js/jsfeat/dat.gui.min.js"></script>
     <script type="text/javascript">
-        function toggleRunning() {
+        function toggleRunning(capture) {
             var scope = angular.element(document.getElementById('angular-div')).scope();
+            scope.lastPing = 0;
             if (scope.running == undefined) {
-              scope.running = false;
+                scope.running = false;
             }
-            if (scope.running) {
-              location.reload();
+            if (!capture && scope.running) {
+                location.reload();
             }
             scope.running = true;
             "use strict";
@@ -125,8 +126,9 @@
                 canvasHeight = canvas.height;
                 ctx = canvas.getContext('2d');
 
-                ctx.fillStyle = "rgb(0,255,0)";
-                ctx.strokeStyle = "rgb(0,255,0)";
+                ctx.lineWidth = 6;
+                ctx.fillStyle = "rgb(255,0,0)";
+                ctx.strokeStyle = "rgb(255,0,0)";
 
                 var scale = Math.min(max_work_size / videoWidth, max_work_size / videoHeight);
                 var w = (videoWidth * scale) | 0;
@@ -188,6 +190,18 @@
                     work_ctx.drawImage(video, 0, 0, work_canvas.width, work_canvas.height);
                     var imageData = work_ctx.getImageData(0, 0, work_canvas.width, work_canvas.height);
 
+                    if (capture) {
+                        var dt = canvas.toDataURL('image/png');
+                        dt = dt.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
+                        dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png');
+                        var ele = document.createElement('a');
+                        ele.setAttribute('href', dt);
+                        ele.setAttribute('download', 'image.png');
+                        ele.click();
+                        capture = false;
+                        return;
+                    }
+
                     stat.start("haar detector");
 
                     jsfeat.imgproc.grayscale(imageData.data, work_canvas.width, work_canvas.height, img_u8);
@@ -215,10 +229,10 @@
                     // draw only top 5
                     draw_faces(ctx, rects, canvasWidth / img_u8.cols, 5);
 
-                    if (FRAME_IDX % 100 == 0) {
-                        // drawOverlay();
-                        scope.displayDetected();
-                    }
+                    // if (FRAME_IDX % 100 == 0) {
+                    //     // drawOverlay();
+                    //     scope.displayDetected();
+                    // }
 
                     $('#log').html(stat.log());
                 }
@@ -260,7 +274,7 @@
                 for (var i = 0; i < n; ++i) {
                     (function(i) {
                         r = rects[i];
-                        if (FRAME_IDX == 1) {
+                        if (true) {
                             // console.log('ping', sc);
                             xp = parseInt(r.width * 0.3);
                             yp = parseInt(r.height * 0.3);
@@ -268,31 +282,35 @@
                                 rectIdx: i,
                                 rect: [((r.x - xp) * sc) | 0, ((r.y - yp) * sc) | 0, ((r.width + 2 * xp) * sc) | 0, ((r.height + 2 * yp) * sc) | 0]
                             };
+                            ctx.strokeRect(((r.x - xp/2) * sc) | 0, ((r.y - yp/2) * sc) | 0, ((r.width + xp) * sc) | 0, ((r.height + yp) * sc) | 0);
                             cropPlusExport(canvas, ((r.x - xp) * sc) | 0, ((r.y - yp) * sc) | 0, ((r.width + 2 * xp) * sc) | 0, ((r.height + 2 * yp) * sc) | 0).toBlob(function(blob) {
                                 // console.log(scope.idArr,i,scope.idArr[i]);
                                 blob.name = 'image.png';
-                                scope.uploadFile([blob], scope.idArr[i].query).then(function(query) {
-                                    scope.identifyPersonFromFace(query, {}).then(function(data) {
-                                        if (data.name !== 'unknown') {
-                                            // console.log(data);
-                                            // var rectIdx = data.state.rectIdx;
-                                            // var rect = data.state.rect;
-                                            // scope.overlay = {
-                                            //     rect: rect,
-                                            //     text: data.name + " | " + data.userData
-                                            // };
-                                            data.timestamp = (new Date()).getTime() / 1000;
-                                            scope.detected[data.personId] = data;
-                                        }
+                                if ((new Date()).getTime() > scope.lastPing + 1000) {
+                                    scope.lastPing = (new Date()).getTime();
+                                    // console.log(scope.lastPing);
+                                    scope.uploadFile([blob], scope.idArr[i].query).then(function(query) {
+                                        scope.identifyPersonFromFace(query, {}).then(function(data) {
+                                            if (data.name !== 'unknown') {
+                                                // console.log(data);
+                                                // var rectIdx = data.state.rectIdx;
+                                                // var rect = data.state.rect;
+                                                // scope.overlay = {
+                                                //     rect: rect,
+                                                //     text: data.name + " | " + data.userData
+                                                // };
+                                                data.timestamp = (new Date()).getTime() / 1000;
+                                                scope.detected[data.personId] = data;
+                                                scope.displayDetected();
+                                            }
+                                        }, function(err) {
+                                            console.log(err);
+                                        });
                                     }, function(err) {
                                         console.log(err);
                                     });
-                                }, function(err) {
-                                    console.log(err);
-                                });
+                                }
                             });
-                        } else {
-                            ctx.strokeRect((r.x * sc) | 0, (r.y * sc) | 0, (r.width * sc) | 0, (r.height * sc) | 0);
                         }
                     })(i);
                 }
