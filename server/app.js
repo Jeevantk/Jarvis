@@ -79,3 +79,8 @@ app.use(function(req, res, next) {
 
 
 module.exports = app;
+
+var port = 8081; 
+app.listen(8081, function () {
+  console.log(`Bank of Baroda App listening on port  ${port}!`);
+});
