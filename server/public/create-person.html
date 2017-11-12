@@ -11,25 +11,33 @@
 			<input type="text" ng-model="person.name" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
 		</div>
 		<br>
-		<div class="input-group col-md-6">
-			<span class="input-group-addon" id="basic-addon1">Data</span>
-			<input type="text" ng-model="person.data" class="form-control" placeholder="Data" aria-label="Data" aria-describedby="basic-addon1">
+		<!-- <center> -->
+		<div class="col-md-6 col-offset-md-2">
+			<!-- <span class="input-group-addon" id="basic-addon1">Data</span> -->
+			<!-- <input type="text" ng-model="person.data" class="form-control" placeholder="Data" aria-label="Data" aria-describedby="basic-addon1"> -->
+			<div class="radio">
+				<label><input type="radio" ng-model="person.data" value="highnet">High-net customer</label>
+			</div>
+			<div class="radio">
+				<label><input type="radio" ng-model="person.data" value="normal">Normal</label>
+			</div>
 		</div>
-		<br>
-		<div>
-			<input id="file-input" ngf-max-size="20MB" ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen, person)">
-		</div>
-		<br>
-		<div class="input-group col-md-6">
-			<span class="input-group-addon" id="basic-addon1">Urls (comma separated)</span>
-			<input type="text" ng-model="person.rawurls" class="form-control" placeholder="Urls (comma separated)" aria-label="Urls (comma separated)" aria-describedby="basic-addon1">
-		</div>
-		<br>
-		<button type="button" class="btn btn-danger" ng-click="createPersonAndTrain(person, personGroupTrain)">Submit</button>
-		<br><br>
-		<div class="btn-group" role="group" aria-label="Basic example">
+	<!-- </center> -->
+			<br>
+			<div>
+				<input id="file-input" ngf-max-size="20MB" ng-model="filesChosen" type="file" multiple=true ngf-select="uploadFile(filesChosen, person)">
+			</div>
+			<br>
+			<div class="input-group col-md-6">
+				<span class="input-group-addon" id="basic-addon1">Urls (comma separated)</span>
+				<input type="text" ng-model="person.rawurls" class="form-control" placeholder="Urls (comma separated)" aria-label="Urls (comma separated)" aria-describedby="basic-addon1">
+			</div>
+			<br>
+			<button type="button" class="btn btn-danger" ng-click="createPersonAndTrain(person, personGroupTrain)">Submit</button>
+			<br><br>
+			<div class="btn-group" role="group" aria-label="Basic example">
 				<button type="button" class="btn btn-primary"> Training status</button>
 				<button type="button" class="btn btn-secondary"> {{ personGroupTrain.status.status || 'unknown'}}</button>
-		</div>
+			</div>
 	</center>
 </div>

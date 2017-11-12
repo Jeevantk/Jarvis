@@ -197,7 +197,7 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
     }
 
     $scope.notify = function(text) {
-      console.log('NOTIF: ' + text);
+      // console.log('NOTIF: ' + text);
     }
 
     $scope.getCSSClass = function(person) {
