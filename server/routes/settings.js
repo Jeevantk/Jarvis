@@ -1,4 +1,4 @@
 module.exports = {
-	mscs_api_key: "8f9ca82c9c0544838cb429d542f2d19e",
+	mscs_api_key: "ced5e0617a0c47d8b369bb79fb7d2a79",
 	prefix_path: "http://13.127.11.214:3000"
 }
