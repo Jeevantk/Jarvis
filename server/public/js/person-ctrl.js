@@ -7,9 +7,19 @@
 
 
 
-var app = angular.module('fid-app', ['ngFileUpload']);
+var app = angular.module('fid-app', ['ngFileUpload', 'ui-notification']).config(function(NotificationProvider) {
+        NotificationProvider.setOptions({
+            delay: 3000,
+            startTop: 20,
+            startRight: 10,
+            verticalSpacing: 20,
+            horizontalSpacing: 20,
+            positionX: 'left',
+            positionY: 'bottom'
+        });
+    });
 
-app.controller('personCtrl', function($scope, $http, Upload, $window) {
+app.controller('personCtrl', function($scope, $http, Upload, $window, Notification) {
     $scope.DEFAULT_PERSON_GROUP_ID = "pg-debug";
     $scope.DETECTED_TIME_INTERVAL = 10; // seconds
 
@@ -115,11 +125,11 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
             }
         };
 
-        console.log(req);
+        // console.log(req);
 
         return $http(req).
         then(function(response) {
-            console.log(response);
+            // console.log(response);
             // alert('Done');
             $scope.resetPerson();
         }, function(err) {
@@ -150,7 +160,8 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
 
         $http(req).
         then(function(response) {
-            alert(response.data);
+            // alert(response.data);
+            Notification.success(response.data);
         }, function(err) {
             console.log(err);
         });
@@ -198,6 +209,7 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
 
     $scope.notify = function(text) {
       // console.log('NOTIF: ' + text);
+      Notification.success(text);
     }
 
     $scope.getCSSClass = function(person) {
