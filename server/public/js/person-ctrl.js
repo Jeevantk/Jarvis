@@ -10,6 +10,9 @@
 var app = angular.module('fid-app', ['ngFileUpload']);
 
 app.controller('personCtrl', function($scope, $http, Upload, $window) {
+    $scope.DEFAULT_PERSON_GROUP_ID = "pg-debug";
+    $scope.DETECTED_TIME_INTERVAL = 10; // seconds
+
     $scope.ping = function() {
         $http.get('//freegeoip.net/json/').then(function(response) {
             var req = {
@@ -33,7 +36,8 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
     $scope.resetPerson = function() {
         $scope.person = {
             rawurls: "",
-            url: []
+            url: [],
+            personGroupId: $scope.DEFAULT_PERSON_GROUP_ID
         };
     }
 
@@ -54,7 +58,8 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
         $scope.personGroupTrain = {
             status: {
                 status: 'unknown'
-            }
+            },
+            personGroupId: $scope.DEFAULT_PERSON_GROUP_ID
         };
     }
 
@@ -97,8 +102,9 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
     }
 
     $scope.createPersonFromFaces = function(obj) {
-        var urls = obj.rawurls.trim();
-        obj.url = obj.url.concat(urls.split(',')).join(',');
+        var urls = obj.rawurls.trim(), arr = urls.split(',');
+        if (urls.length == 0) arr = [];
+        obj.url = obj.url.concat(arr).join(',');
 
         var req = {
             method: 'POST',
@@ -109,14 +115,27 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
             }
         };
 
-        $http(req).
+        console.log(req);
+
+        return $http(req).
         then(function(response) {
             console.log(response);
-            alert('Done');
+            // alert('Done');
             $scope.resetPerson();
         }, function(err) {
             console.log(err);
         });
+    }
+
+    $scope.trainInterval = null;
+
+    $scope.createPersonAndTrain = function(createObj, trainObj) {
+      $scope.createPersonFromFaces(createObj).then(function() {
+        trainObj.status.status = 'unknown';
+        $scope.trainPersonGroup(trainObj).then(function() {
+          $scope.trainInterval = setInterval($scope.getPersonGroupTrainingStatus(trainObj), 500);
+        });
+      });
     }
 
     $scope.createPersonGroup = function(obj) {
@@ -146,9 +165,9 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
             }
         };
 
-        $http(req).
+        return $http(req).
         then(function(response) {
-            alert(response.data);
+            // alert(response.data);
         }, function(err) {
             console.log(err);
         });
@@ -167,9 +186,52 @@ app.controller('personCtrl', function($scope, $http, Upload, $window) {
         then(function(response) {
             // console.log(response);
             $scope.personGroupTrain.status = response.data;
+            if (response.data === 'succeeded' || response.data === 'failed') {
+              if ($scope.trainInterval !== null) {
+                cancelInterval($scope.trainInterval);
+              }
+            }
         }, function(err) {
             console.log(err);
         });
+    }
+
+    $scope.notify = function(text) {
+      console.log('NOTIF: ' + text);
+    }
+
+    $scope.getCSSClass = function(person) {
+      var common = 'list-group-item';
+      if (person.userData === 'highnet') {
+        return common + ' list-group-item-danger';
+      }
+      return common + ' list-group-item-success';
+    }
+
+    $scope.noOneDetected = true;
+
+    $scope.displayDetected = function() {
+      var curTime = (new Date()).getTime()/1000;
+      var expiredIds = [];
+      $scope.noOneDetected = true;
+      for (var personId in $scope.detected) {
+        // console.log(curTime, obj[personId].timestamp + $scope.DETECTED_TIME_INTERVAL);
+        if (curTime > ($scope.detected[personId].timestamp + $scope.DETECTED_TIME_INTERVAL)) {
+          expiredIds.push(personId);
+        }
+      }
+      for (var i = 0; i < expiredIds.length; ++i) {
+        delete $scope.detected[expiredIds[i]];
+      }
+      // console.log(obj, expiredIds);
+
+      for (var personId in $scope.detected) {
+        person = $scope.detected[personId];
+        if (person.userData === 'highnet') {
+          $scope.notify('New highnet individual!');
+        }
+        if ($scope.noOneDetected) $scope.noOneDetected = false;
+      }
     }
 
     $scope.uploadFile = function(files, obj) {

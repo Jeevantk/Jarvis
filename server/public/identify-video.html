@@ -1,0 +1,43 @@
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Sans:regular,bold|Inconsolata|PT+Sans:400,700">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/jsfeat.css">
+</head>
+
+<!-- <body ng-app="fid-app"> -->
+<div ng-controller="personCtrl" id="angular-div" ng-init="resetIdentifyQuery()">
+    <center>
+        <br>
+        <div class="col-md-6">
+            <button class="btn btn-danger" onclick="toggleRunning()" style="cursor:pointer" type="button">
+              {{ running && 'Stop' || 'Start'}}
+            </button>
+        </div>
+    </center>
+    <div class="row">
+        <div>
+            <video id="webcam" width="640" height="480" style="display:none;"></video>
+            <div style=" width:640px;height:480px;margin: 10px auto;">
+                <canvas id="canvas" width="640" height="480"></canvas>
+                <div id="no_rtc" class="alert alert-error" style="display:none;"></div>
+                <div id="log" class="alert alert-info"></div>
+            </div>
+        </div>
+        <div class="container col-md-4">
+            <center>
+                <ul style="list-style: none;" class="list-group">
+                    <li>
+                        <h4> Detected persons </h4>
+                    </li>
+                    <li ng-show="noOneDetected">
+                        <h5> No one detected </h5>
+                    </li>
+                    <li ng-repeat="(_id, _person) in detected" ng-class="getCSSClass(_person)">
+                        <h3> {{ _person.name }} </h3>
+                    </li>
+                </ul>
+            </center>
+        </div>
+    </div>
+</div>
+</div>

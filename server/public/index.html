@@ -4,7 +4,6 @@
     <script src="js/angular.min.js"></script>
     <script src="js/ng-file-upload.min.js"></script>
     <script src="js/person-ctrl.js"></script>
-    <!-- <script type="text/javascript" src="https://rawgithub.com/hiddentao/google-tts/master/google-tts.min.js"></script> -->
     <script src="js/ng-file-upload-shim.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
@@ -17,30 +16,292 @@
 <body ng-app="fid-app" ng-init="pref=0">
     <div ng-controller="personCtrl">
         <center>
-          <br>
-            <h2> Person identification </h2>
+            <br>
+            <h2> Jarvis </h2>
             <br>
             <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=0">Create person group</button>
-                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=1">Create person</button>
-                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=2">Train person group</button>
-                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=3">Identify person</button>
+                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=0">Identify</button>
+                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=1">Add person</button>
             </div>
         </center>
     </div>
     <br>
-    <div ng-show="pref==0">
-        <div ng-include="'create-person-group.html'"></div>
-    </div>
     <div ng-show="pref==1">
         <div ng-include="'create-person.html'"></div>
     </div>
-    <div ng-show="pref==2">
-        <div ng-include="'train-person-group.html'"></div>
+    <div ng-show="pref==0">
+        <div ng-include="'identify-video.html'"></div>
     </div>
-    <div ng-show="pref==3">
-        <div ng-include="'identify-person.html'"></div>
-    </div>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jsfeat/jsfeat-min.js"></script>
+    <script type="text/javascript" src="js/jsfeat/frontalface.js"></script>
+    <script type="text/javascript" src="js/jsfeat/compatibility.js"></script>
+    <script type="text/javascript" src="js/jsfeat/profiler.js"></script>
+    <script type="text/javascript" src="js/jsfeat/dat.gui.min.js"></script>
+    <script type="text/javascript">
+        function toggleRunning() {
+            var scope = angular.element(document.getElementById('angular-div')).scope();
+            if (scope.running == undefined) {
+              scope.running = false;
+            }
+            if (scope.running) {
+              location.reload();
+            }
+            scope.running = true;
+            "use strict";
+
+            // lets do some fun
+            var video = document.getElementById('webcam');
+            var canvas = document.getElementById('canvas');
+            try {
+                var attempts = 0;
+                var readyListener = function(event) {
+                    findVideoSize();
+                };
+                var findVideoSize = function() {
+                    if (video.videoWidth > 0 && video.videoHeight > 0) {
+                        video.removeEventListener('loadeddata', readyListener);
+                        onDimensionsReady(video.videoWidth, video.videoHeight);
+                    } else {
+                        if (attempts < 10) {
+                            attempts++;
+                            setTimeout(findVideoSize, 200);
+                        } else {
+                            onDimensionsReady(640, 480);
+                        }
+                    }
+                };
+                var onDimensionsReady = function(width, height) {
+                    demo_app(width, height);
+                    compatibility.requestAnimationFrame(tick);
+                };
+
+                video.addEventListener('loadeddata', readyListener);
+
+                compatibility.getUserMedia({
+                    video: true
+                }, function(stream) {
+                    try {
+                        video.src = compatibility.URL.createObjectURL(stream);
+                    } catch (error) {
+                        video.src = stream;
+                    }
+                    scope.videoPlayTimer = setTimeout(function() {
+                        video.play();
+                    }, 500);
+                }, function(error) {
+                    $('#canvas').hide();
+                    $('#log').hide();
+                    $('#no_rtc').html('<h4>WebRTC not available.</h4>');
+                    $('#no_rtc').show();
+                });
+            } catch (error) {
+                $('#canvas').hide();
+                $('#log').hide();
+                $('#no_rtc').html('<h4>Something goes wrong...</h4>');
+                $('#no_rtc').show();
+            }
+
+            var stat = new profiler();
+
+            var gui, options, ctx, canvasWidth, canvasHeight;
+            var img_u8, work_canvas, work_ctx, ii_sum, ii_sqsum, ii_tilted, edg, ii_canny;
+            var classifier = jsfeat.haar.frontalface;
+
+            var max_work_size = 160;
+
+            var demo_opt = function() {
+                this.min_scale = 2;
+                this.scale_factor = 1.15;
+                this.use_canny = false;
+                this.edges_density = 0.13;
+                this.equalize_histogram = true;
+            }
+
+            function demo_app(videoWidth, videoHeight) {
+                canvasWidth = canvas.width;
+                canvasHeight = canvas.height;
+                ctx = canvas.getContext('2d');
+
+                ctx.fillStyle = "rgb(0,255,0)";
+                ctx.strokeStyle = "rgb(0,255,0)";
+
+                var scale = Math.min(max_work_size / videoWidth, max_work_size / videoHeight);
+                var w = (videoWidth * scale) | 0;
+                var h = (videoHeight * scale) | 0;
+
+                img_u8 = new jsfeat.matrix_t(w, h, jsfeat.U8_t | jsfeat.C1_t);
+                edg = new jsfeat.matrix_t(w, h, jsfeat.U8_t | jsfeat.C1_t);
+                work_canvas = document.createElement('canvas');
+                work_canvas.width = w;
+                work_canvas.height = h;
+                work_ctx = work_canvas.getContext('2d');
+                ii_sum = new Int32Array((w + 1) * (h + 1));
+                ii_sqsum = new Int32Array((w + 1) * (h + 1));
+                ii_tilted = new Int32Array((w + 1) * (h + 1));
+                ii_canny = new Int32Array((w + 1) * (h + 1));
+
+                options = new demo_opt();
+
+                // gui = new dat.GUI();
+                //
+                // gui.add(options, 'min_scale', 1, 4).step(0.1);
+                // gui.add(options, 'scale_factor', 1.1, 2).step(0.025);
+                // gui.add(options, 'equalize_histogram');
+                // gui.add(options, 'use_canny');
+                // gui.add(options, 'edges_density', 0.01, 1.).step(0.005);
+
+                stat.add("haar detector");
+            }
+
+            var FRAME_IDX = 0;
+            // 600 frames once you trigger an identify query
+            const IDENTIFY_QUERY_FREQ = 600;
+
+            scope.idArr = [];
+            scope.overlay = null;
+            // NOTE Hardcoded person-group
+            scope.personGroupId = "pg-debug";
+            scope.detected = {};
+
+            function setIdArr(len) {
+                while (scope.idArr.length < len) {
+                    scope.idArr.push({
+                        query: {
+                            personGroupId: scope.DEFAULT_PERSON_GROUP_ID
+                        },
+                        resp: {}
+                    });
+                }
+            }
+
+            function tick() {
+                compatibility.requestAnimationFrame(tick);
+                stat.new_frame();
+
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    FRAME_IDX = (FRAME_IDX + 1) % IDENTIFY_QUERY_FREQ;
+                    ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
+
+                    work_ctx.drawImage(video, 0, 0, work_canvas.width, work_canvas.height);
+                    var imageData = work_ctx.getImageData(0, 0, work_canvas.width, work_canvas.height);
+
+                    stat.start("haar detector");
+
+                    jsfeat.imgproc.grayscale(imageData.data, work_canvas.width, work_canvas.height, img_u8);
+
+                    // possible options
+                    if (options.equalize_histogram) {
+                        jsfeat.imgproc.equalize_histogram(img_u8, img_u8);
+                    }
+                    //jsfeat.imgproc.gaussian_blur(img_u8, img_u8, 3);
+
+                    jsfeat.imgproc.compute_integral_image(img_u8, ii_sum, ii_sqsum, classifier.tilted ? ii_tilted : null);
+
+                    if (options.use_canny) {
+                        jsfeat.imgproc.canny(img_u8, edg, 10, 50);
+                        jsfeat.imgproc.compute_integral_image(edg, ii_canny, null, null);
+                    }
+
+                    jsfeat.haar.edges_density = options.edges_density;
+                    var rects = jsfeat.haar.detect_multi_scale(ii_sum, ii_sqsum, ii_tilted, options.use_canny ? ii_canny : null, img_u8.cols, img_u8.rows, classifier, options.scale_factor, options.min_scale);
+                    rects = jsfeat.haar.group_rectangles(rects, 1);
+
+                    stat.stop("haar detector");
+
+                    setIdArr(rects.length);
+                    // draw only top 5
+                    draw_faces(ctx, rects, canvasWidth / img_u8.cols, 5);
+
+                    if (FRAME_IDX % 100 == 0) {
+                        // drawOverlay();
+                        scope.displayDetected();
+                    }
+
+                    $('#log').html(stat.log());
+                }
+            }
+
+            function cropPlusExport(img, cropX, cropY, cropWidth, cropHeight) {
+                // create a temporary canvas sized to the cropped size
+                var canvas1 = document.createElement('canvas');
+                var ctx1 = canvas1.getContext('2d');
+                canvas1.width = cropWidth;
+                canvas1.height = cropHeight;
+                // use the extended from of drawImage to draw the
+                // cropped area to the temp canvas
+                ctx1.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+                // return the .toDataURL of the temp canvas
+                return canvas1;
+            }
+
+            function drawOverlay() {
+                if (scope.overlay !== null) {
+                    var rect = scope.overlay.rect;
+                    ctx.font = "24px Comic Sans MS";
+                    ctx.fillStyle = "black";
+                    ctx.textAlign = "center";
+                    ctx.fillText(scope.overlay.text, rect[0], rect[1]);
+                }
+            }
+
+            function draw_faces(ctx, rects, sc, max) {
+                var on = rects.length;
+                if (on && max) {
+                    jsfeat.math.qsort(rects, 0, on - 1, function(a, b) {
+                        return (b.confidence < a.confidence);
+                    })
+                }
+                var n = max || on;
+                n = Math.min(n, on);
+                var r, xp, yp;
+                for (var i = 0; i < n; ++i) {
+                    (function(i) {
+                        r = rects[i];
+                        if (FRAME_IDX == 1) {
+                            // console.log('ping', sc);
+                            xp = parseInt(r.width * 0.3);
+                            yp = parseInt(r.height * 0.3);
+                            scope.idArr[i].query.state = {
+                                rectIdx: i,
+                                rect: [((r.x - xp) * sc) | 0, ((r.y - yp) * sc) | 0, ((r.width + 2 * xp) * sc) | 0, ((r.height + 2 * yp) * sc) | 0]
+                            };
+                            cropPlusExport(canvas, ((r.x - xp) * sc) | 0, ((r.y - yp) * sc) | 0, ((r.width + 2 * xp) * sc) | 0, ((r.height + 2 * yp) * sc) | 0).toBlob(function(blob) {
+                                // console.log(scope.idArr,i,scope.idArr[i]);
+                                blob.name = 'image.png';
+                                scope.uploadFile([blob], scope.idArr[i].query).then(function(query) {
+                                    scope.identifyPersonFromFace(query, {}).then(function(data) {
+                                        if (data.name !== 'unknown') {
+                                            // console.log(data);
+                                            // var rectIdx = data.state.rectIdx;
+                                            // var rect = data.state.rect;
+                                            // scope.overlay = {
+                                            //     rect: rect,
+                                            //     text: data.name + " | " + data.userData
+                                            // };
+                                            data.timestamp = (new Date()).getTime() / 1000;
+                                            scope.detected[data.personId] = data;
+                                        }
+                                    }, function(err) {
+                                        console.log(err);
+                                    });
+                                }, function(err) {
+                                    console.log(err);
+                                });
+                            });
+                        } else {
+                            ctx.strokeRect((r.x * sc) | 0, (r.y * sc) | 0, (r.width * sc) | 0, (r.height * sc) | 0);
+                        }
+                    })(i);
+                }
+            }
+
+            $(window).unload(function() {
+                video.pause();
+                video.src = null;
+            });
+        }
+    </script>
 </body>
 
 </html>
