@@ -1,17 +1,32 @@
-# bankOfBarodaFinathon
-Contains hackathon source files for Bank of Baroda Finathon Challenge
+# Jarvis
 
+## What is Jarvis?
+Jarvis is a facial recognizer application powered using Microsoft Cognitive APIs and JSFeat
 
+## What technologies did you use?
+* A NodeJS server handles queries
+* Client-side logic is handled using AngularJS, a bit of JQuery and Vanilla Javascript
 
+## How to run Jarvis?
+`cd` into the current directory (`server`)
 
-Usefull Links
-https://docs.microsoft.com/en-in/azure/cognitive-services/face/overview
+Install Node (version 4+, preferably using NVM)
 
+Install npm dependencies using `npm install`
 
-Endpoint: https://westcentralus.api.cognitive.microsoft.com/face/v1.0
+Note that a copy of Microsoft's Cognitive API is attached with the repository as it is modified for our use-cases
 
-Key 1: c51069da5b03419d98175a1dced2fbba
+Once the dependencies are installed, you are ready to run Jarvis
 
-Key 2: 4a931f62a0844e3cbd6f084eab9b89e4
+Open a new shell and run the server using
 
+```
+% node bin/www
+```
+To run it as a daemon, you can use the `restart-server` script which uses `forever` to do the job
 
+The default port is `3000`, so navigate to `localhost:3000` and have fun hacking Jarvis :)
+
+## Is there an Online demo for Jarvis?
+
+Yes! It can be found here: http://bit.ly/2zQO2TP
