@@ -30,3 +30,4 @@ The default port is `3000`, so navigate to `localhost:3000` and have fun hacking
 ## Is there an Online demo for Jarvis?
 
 Yes! It can be found here: http://bit.ly/2zQO2TP
+Note that it works on Firefox (not Chrome as Chrome doesn't allow WebRTC from non-secure domains).
