@@ -9,7 +9,7 @@
 
 const MSCSFACEAPI = require("mscs-face-api");
 const settings = require('../settings');
-var api = new MSCSFACEAPI(settings.mscs_api_key,"SA");
+var api = new MSCSFACEAPI(settings.mscs_api_key.person,"SA");
 var Person = require('./model');
 var Q = require('q');
 var _ = require('underscore');

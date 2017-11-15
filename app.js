@@ -59,6 +59,7 @@ app.use('/', function(req, res, next) {
 });
 
 app.use('/api/person', require('./routes/person'));
+app.use('/api/emotion', require('./routes/emotion'));
 
 app.post('/', function(req, res) {
     if (!(req.files.uploaded instanceof Array)) {
