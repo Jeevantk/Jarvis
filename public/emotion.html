@@ -68,8 +68,21 @@
                 scope.running = false;
             }
             if (!capture && scope.running) {
+                // console.log(scope.stats);
+                var text = "Most prominent emotion\t: " + Object.keys(scope.stats.emotion).reduce(function(a, b) {
+                    return scope.stats.emotion[a] > scope.stats.emotion[b] ? a : b
+                });
+                text = text + "\nOverall score\t: " + scope.stats.score.avg;
+                alert(text);
                 location.reload();
             }
+            scope.stats = {
+                emotion: null,
+                score: {
+                    count: 0,
+                    avg: 0
+                }
+            };
             scope.running = true;
             "use strict";
 
@@ -195,6 +208,21 @@
                 }
             }
 
+            function updateStats(score, emotion, emotionScore) {
+                // console.log(scope.stats);
+                if (scope.stats.emotion === null) {
+                    scope.stats.emotion = {};
+                    for (var key in score) {
+                        scope.stats.emotion[key] = 0;
+                    }
+                }
+                scope.stats.emotion[emotion] += 1;
+                var avg = (scope.stats.score.avg * scope.stats.score.count + emotionScore);
+                scope.stats.score.count += 1;
+                avg = avg * 1.0 / scope.stats.score.count;
+                scope.stats.score.avg = avg;
+            }
+
             function tick() {
                 compatibility.requestAnimationFrame(tick);
                 stat.new_frame();
@@ -278,9 +306,9 @@
             }
 
             function getEmotionScore(score) {
-              var val = score.happiness + 0.8*score.neutral + 0.7*score.surprise + 0.5*score.sadness;
-              val = val + 0.4*score.fear + 0.3*score.disgust + 0.2*score.contempt + 0.1*score.anger;
-              return val*10.0;
+                var val = score.happiness + 0.8 * score.neutral + 0.7 * score.surprise + 0.5 * score.sadness;
+                val = val + 0.4 * score.fear + 0.3 * score.disgust + 0.2 * score.contempt + 0.1 * score.anger;
+                return val * 10.0;
             }
 
             function draw_faces(ctx, rects, sc, max) {
@@ -315,12 +343,18 @@
                                     scope.uploadFile([blob], scope.idArr[i].query).then(function(query) {
                                         scope.identifyEmotionFromFace(query, {}).then(function(resp) {
                                             var data = resp.data;
-                                            if(data.state && data.data && data.data.length) {
-                                              var scores = data.data[0].scores, state = data.state;
-                                              scope.overlay = {};
-                                              scope.overlay.rect = state.rect;
-                                              var emotion = Object.keys(scores).reduce(function(a, b){ return scores[a] > scores[b] ? a : b });
-                                              scope.overlay.text = emotion + " | " + getEmotionScore(scores);
+                                            if (data.state && data.data && data.data.length) {
+                                                var scores = data.data[0].scores,
+                                                    state = data.state;
+                                                scope.overlay = {};
+                                                scope.overlay.rect = state.rect;
+                                                var emotion = Object.keys(scores).reduce(function(a, b) {
+                                                    return scores[a] > scores[b] ? a : b
+                                                });
+                                                var emotionScore = getEmotionScore(scores);
+                                                scope.overlay.text = emotion + " | " + emotionScore;
+
+                                                updateStats(scores, emotion, emotionScore);
                                             }
                                         }, function(err) {
                                             console.log(err);
