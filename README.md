@@ -1,7 +1,7 @@
 # Jarvis
 
 ## What is Jarvis?
-Jarvis is a facial recognizer application powered using Microsoft Cognitive APIs and JSFeat
+Jarvis is a facial/emotion recognizer application powered using Microsoft Cognitive APIs and JSFeat
 
 ## What technologies did you use?
 * A NodeJS server handles queries
@@ -26,6 +26,8 @@ Open a new shell and run the server using
 To run it as a daemon, you can use the `restart-server` script which uses `forever` to do the job
 
 The default port is `3000`, so navigate to `localhost:3000` and have fun hacking Jarvis :)
+
+Emotion recognizer is also available. Naviagate to `localhost:3000/emotion.html` to test EmoJarvis
 
 ## Is there an Online demo for Jarvis?
 
