@@ -1,6 +1,12 @@
 <html>
 
 <head>
+
+	<script>
+		function openWin() {
+    	window.open("http://13.127.11.214:3000/emotion.html");
+	}
+	</script>
     <script src="js/angular.min.js"></script>
     <script src="js/ng-file-upload.min.js"></script>
     <script src="js/person-ctrl.js"></script>
@@ -24,6 +30,7 @@
             <div class="btn-group" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=0">Identify</button>
                 <button type="button" class="btn btn-outline-danger" style="cursor:pointer" ng-click="$parent.pref=1">Add person</button>
+                <button type="button" class="btn btn-outline-danger" style="cursor:pointer" value="Open Window" onclick="openWin()">Emotion</button>
             </div>
         </center>
     </div>
@@ -323,7 +330,6 @@
         }
     </script>
 
-    <a href="http://13.127.11.214:3000/emotion.html"> Emotion</a>>
 </body>
 
 </html>
